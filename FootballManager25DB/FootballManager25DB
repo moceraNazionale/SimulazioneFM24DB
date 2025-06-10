@@ -1,0 +1,53 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ */
+package com.mycompany.footballmanager25db;
+
+import com.google.api.services.sheets.v4.Sheets;
+import com.mycompany.footballmanager25db.googleApi.GoogleSheetsService;
+import com.mycompany.footballmanager25db.googleApi.PerformanceEntry;
+import com.mycompany.footballmanager25db.googleApi.SheetDataFetcher;
+import com.mycompany.footballmanager25db.googleApi.SheetDataParser;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
+import java.util.List;
+
+/**
+ *
+ * @author daniele
+ */
+public class FootballManager25DB {
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
+        try {
+            GoogleSheetsService sheetsService = new GoogleSheetsService();
+            String credentialPath = "/home/daniele/Desktop/SCUOLA/TRIENNIO/CAPOLAVORO/credenzialiProgettoFm24DB/footballmanagerdb-fb5e96a03d09.json";
+            Sheets sheets = sheetsService.createSheetsService(credentialPath);
+            System.out.println("Connessione a Google Sheets effettuata");
+            String spreadsheetsId = "1P-9E0FxECtiBZC8cpKAXagIwzg4yDBKOv6WIrhaDNbo";
+            SheetDataFetcher dataFetcher = new SheetDataFetcher(sheets);
+            SheetDataParser dataParser = new SheetDataParser();
+            List<PerformanceEntry> list = dataParser.parse(dataFetcher.fetchSheetData(spreadsheetsId, "SERIE A", "ER"), "A");
+            System.out.println(list.size());
+            for (PerformanceEntry entry : list) {
+                entry.aggiornaDB();
+            }
+            list.clear();
+            list = dataParser.parse(dataFetcher.fetchSheetData(spreadsheetsId, "SERIE B", "ER"), "B");
+            System.out.println(list.size());
+            for (PerformanceEntry entry : list) {
+                entry.aggiornaDB();
+            }
+            list.clear();
+            list = dataParser.parse(dataFetcher.fetchSheetData(spreadsheetsId, "SERIE C", "ER"), "C");
+            System.out.println(list.size());
+            for (PerformanceEntry entry : list) {
+                entry.aggiornaDB();
+            }
+            list.clear();
+        } catch (GeneralSecurityException ex) {
+            System.getLogger(FootballManager25DB.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
+    }
+}
